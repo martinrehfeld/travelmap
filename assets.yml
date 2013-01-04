@@ -4,6 +4,7 @@ javascript_compressor: yui
 template_function: _.template
 javascripts:
   site:
+    - public/javascripts/raphael-min.js
     - public/javascripts/underscore.js
     - app/templates/*.jst
     - public/javascripts/app/*.js
