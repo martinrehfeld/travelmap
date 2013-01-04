@@ -6,6 +6,7 @@ javascripts:
   site:
     - public/javascripts/raphael-min.js
     - public/javascripts/underscore.js
+    - public/javascripts/worldmap.js
     - app/templates/*.jst
     - public/javascripts/app/*.js
     - public/javascripts/init.js
