@@ -1,0 +1,10 @@
+package_path: javascripts
+package_assets: <%= ENV['MM_ENV'] == 'build' ? 'always' : 'off' %>
+javascript_compressor: yui
+template_function: _.template
+javascripts:
+  site:
+    - public/javascripts/underscore.js
+    - app/templates/*.jst
+    - public/javascripts/app/*.js
+    - public/javascripts/init.js
