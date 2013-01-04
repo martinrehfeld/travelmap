@@ -1,5 +1,8 @@
 class @App
-  constructor: () ->
+  constructor: ->
+    @viewport =
+      width:  $(window).width()
+      height: $(window).height()
 
-  start: () ->
-    (new World).draw()
+  start: ->
+    (new World 'worldmap', @viewport.width, @viewport.height).draw()
