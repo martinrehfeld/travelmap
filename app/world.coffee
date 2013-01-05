@@ -1,6 +1,6 @@
 class @World
-  constructor: (elementId, @width, @height) ->
-    @canvas = Raphael elementId, @width, @height
+  constructor: (el, @width, @height) ->
+    @canvas = Raphael el, @width, @height
 
   draw: ->
     r = @canvas
@@ -17,15 +17,22 @@ class @World
       do (shape) ->
         r.path(shape).attr(stroke: '#ccc6ae', fill: '#f0efeb', 'stroke-opacity': 0.25)
     world = r.setFinish()
-    r.setViewBox(0, 0, 1000, 400, false) # map has 1000x400 -> use full screen
 
     # demonstrate the use of parseLatLon for marking a position by geo coords
     @dot = @canvas.circle().attr(fill: "r#FE7727:50-#F57124:100", stroke: "#fff", "stroke-width": 2, r: 0)
-    @.setMarker('33°51′35.9″S, 151°12′40″E') # Sydney
+    @setMarker('33°51′35.9″S, 151°12′40″E') # Sydney
 
+    # initial viewport
+    @focusEurope()
+
+  focusEurope: =>
+    @canvas.setViewBox(400, 50, 100, 85, false)
+
+  focusWorld: =>
+    @canvas.setViewBox(0, 0, 1000, 400, false)
 
   setMarker: (humanCoords) ->
-    attr = @.parseLatLon(humanCoords)
+    attr = @parseLatLon(humanCoords)
     attr.r = 0
     @dot.stop().attr(attr).animate({r:5}, 1000, 'elastic')
 
@@ -45,4 +52,4 @@ class @World
     lat = -lat if m[4].toUpperCase() == "S"
     lon = m && +m[6] + (m[7] || 0) / 60 + (m[8] || 0) / 3600
     lon = -lon if m[9].toUpperCase() == "W"
-    @.getXY(lat, lon)
+    @getXY(lat, lon)
