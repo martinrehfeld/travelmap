@@ -26,10 +26,14 @@ class @World
     @focusEurope()
 
   focusEurope: =>
-    @canvas.setViewBox(400, 50, 100, 85, false)
+    aspectRatio = @width / @height
+    newHeight = 85
+    newWidth = newHeight * aspectRatio
+    @canvas.setViewBox(400, 50, newWidth, newHeight, false)
 
   focusWorld: =>
-    @canvas.setViewBox(0, 0, 1000, 400, false)
+    anim = new ViewBoxAnimation(@canvas, 1500, x: 0, y: 0, w: 1000, h: 400)
+    setTimeout(anim.execute, 0)
 
   setMarker: (humanCoords) ->
     attr = @parseLatLon(humanCoords)
@@ -53,3 +57,28 @@ class @World
     lon = m && +m[6] + (m[7] || 0) / 60 + (m[8] || 0) / 3600
     lon = -lon if m[9].toUpperCase() == "W"
     @getXY(lat, lon)
+
+
+class ViewBoxAnimation
+  constructor: (canvas, duration, finalViewBox) ->
+    @duration = duration
+    @canvas = canvas
+    @finalViewBox = finalViewBox
+    [@x, @y, @w, @h] = canvas._viewBox
+
+  execute: =>
+    @startTime = new Date().getTime()
+    @endTime = @startTime + @duration
+    window.requestAnimationFrame(@animate)
+
+  animate: =>
+    now = new Date().getTime()
+    completeness = if now >= @endTime then 1 else (now - @startTime) / @duration
+
+    @canvas.setViewBox(@x + ((@finalViewBox.x - @x) * completeness),
+                       @y + ((@finalViewBox.y - @y) * completeness),
+                       @w + ((@finalViewBox.w - @w) * completeness),
+                       @h + ((@finalViewBox.h - @h) * completeness),
+                       false)
+
+    window.requestAnimationFrame(@animate) if completeness != 1
