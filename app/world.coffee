@@ -8,7 +8,7 @@ class @World
     # background
     r.rect(0, 0, @width, @height).attr(
       stroke: 'none',
-      fill: '0-#f8d59b-#e8ad5d'
+      fill: '30-#f8d59b-#e8ad5d'
     )
 
     # country shapes
@@ -17,10 +17,6 @@ class @World
       do (shape) ->
         r.path(shape).attr(stroke: '#a23105', fill: '#b35317', 'stroke-opacity': 0.5)
     world = r.setFinish()
-
-    # demonstrate the use of parseLatLon for marking a position by geo coords
-    @dot = @canvas.circle().attr(fill: "r#FE7727:50-#F57124:100", stroke: "#fff", "stroke-width": 2, r: 0)
-    @setMarker('33°51′35.9″S, 151°12′40″E') # Sydney
 
     # initial viewport
     @focusEurope()
@@ -31,14 +27,32 @@ class @World
     newWidth = newHeight * aspectRatio
     @canvas.setViewBox(400, 50, newWidth, newHeight, false)
 
-  focusWorld: =>
+  focusWorld: (callback) =>
+    callback ?= ->
     anim = new ViewBoxAnimation(@canvas, 1500, x: 0, y: 0, w: 1000, h: 400)
-    setTimeout(anim.execute, 0)
+    setTimeout((=> anim.execute(callback)), 0)
+
+  drawTrip: (fromCoords, toCoords, callback) =>
+    callback ?= ->
+    fromLL = @parseLatLon(fromCoords)
+    toLL   = @parseLatLon(toCoords)
+    path = @canvas.path("M#{fromLL.cx},#{fromLL.cy}")
+                  .attr
+                    stroke: '#a90606'
+                    'stroke-width': 6
+                    'stroke-linecap': 'round'
+                    # 'stroke-dasharray': '.'
+    path.animate {path: "M#{fromLL.cx},#{fromLL.cy}L#{toLL.cx},#{toLL.cy}"},
+                 500, 'linear', =>
+                   path.attr 'arrow-end': 'diamond-narrow-short'
+                   callback()
+
 
   setMarker: (humanCoords) ->
     attr = @parseLatLon(humanCoords)
     attr.r = 0
-    @dot.stop().attr(attr).animate({r:5}, 1000, 'elastic')
+    dot = @canvas.circle().attr(fill: "r#FE7727:50-#F57124:100", stroke: "#fff", "stroke-width": 2, r: 0)
+    dot.stop().attr(attr).animate({r:5}, 1000, 'elastic')
 
   getXY: (lat, lon) ->
     cx: lon * 2.6938 + 465.4,
@@ -66,12 +80,12 @@ class ViewBoxAnimation
     @finalViewBox = finalViewBox
     [@x, @y, @w, @h] = canvas._viewBox
 
-  execute: =>
+  execute: (callback) =>
     @startTime = new Date().getTime()
     @endTime = @startTime + @duration
-    window.requestAnimationFrame(@animate)
+    window.requestAnimationFrame(=> @animate(callback))
 
-  animate: =>
+  animate: (callback) =>
     now = new Date().getTime()
     completeness = if now >= @endTime then 1 else (now - @startTime) / @duration
 
@@ -81,4 +95,7 @@ class ViewBoxAnimation
                        @h + ((@finalViewBox.h - @h) * completeness),
                        false)
 
-    window.requestAnimationFrame(@animate) if completeness != 1
+    if completeness == 1
+      callback()
+    else
+      window.requestAnimationFrame(=> @animate(callback))
