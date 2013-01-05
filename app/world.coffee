@@ -8,14 +8,14 @@ class @World
     # background
     r.rect(0, 0, @width, @height).attr(
       stroke: 'none',
-      fill: '0-#9bb7cb-#adc8da'
+      fill: '0-#f8d59b-#e8ad5d'
     )
 
     # country shapes
     r.setStart()
     for own _, shape of worldmap.shapes
       do (shape) ->
-        r.path(shape).attr(stroke: '#ccc6ae', fill: '#f0efeb', 'stroke-opacity': 0.25)
+        r.path(shape).attr(stroke: '#a23105', fill: '#b35317', 'stroke-opacity': 0.5)
     world = r.setFinish()
 
     # demonstrate the use of parseLatLon for marking a position by geo coords
