@@ -3,6 +3,7 @@
     for own key, loc of @
       do (key, loc) ->
         if key != 'prepare'
+          loc[key] = key
           mapCoords = toMapCoords(loc.ll)
           for own k, v of mapCoords
             do (k, v) ->
@@ -30,6 +31,9 @@
   'Rom':
     ll: '41 54 N 12 27 E'
     name: 'Rom'
+  'Moskau':
+    ll: '55 45 N 37 36 E'
+    name: 'Moskau'
   'New York':
     ll: '40 47 N 73 58 W'
     name: 'New York'

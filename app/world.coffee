@@ -1,5 +1,7 @@
 class @World
   @latlonrg = /(\d+(?:\.\d+)?)[\xb0\s]?\s*(?:(\d+(?:\.\d+)?)['\u2019\u2032\s])?\s*(?:(\d+(?:\.\d+)?)["\u201d\u2033\s])?\s*([SNEW])?/i
+  @rtInitialStroke = '#a90606'
+  @rtInitialStrokeWidth = 4
 
   constructor: (el, @width, @height) ->
     @canvas = Raphael el, @width, @height
@@ -8,10 +10,9 @@ class @World
     r = @canvas
 
     # background
-    r.rect(0, 0, @width, @height).attr(
+    r.rect(0, 0, @width, @height).attr
       stroke: 'none',
       fill: '30-#f8d59b-#e8ad5d'
-    )
 
     # country shapes
     r.setStart()
@@ -33,6 +34,51 @@ class @World
     callback ?= ->
     anim = new ViewBoxAnimation(@canvas, 1500, x: 0, y: 0, w: 1000, h: 400)
     setTimeout((=> anim.execute(callback)), 0)
+
+  _roundtrips: {}
+
+  drawRoundTrip: (from, to) ->
+    p1 =
+      cx: from.cx + (to.cx - from.cx) / 2
+      cy: from.cy + (to.cy - from.cy) / 2 + (to.cx - from.cx) * 0.3
+    p2 =
+      cx: from.cx + (to.cx - from.cx) / 2
+      cy: from.cy + (to.cy - from.cy) / 2 - (to.cx - from.cx) * 0.3
+
+    path = @canvas.path("M#{from.cx},#{from.cy}
+                         Q#{p1.cx},#{p1.cy},#{to.cx},#{to.cy}
+                         Q#{p2.cx},#{p2.cy},#{from.cx},#{from.cy}
+                         Z")
+                  .attr
+                    stroke: World.rtInitialStroke
+                    'stroke-width': World.rtInitialStrokeWidth
+
+    ref = "#{from.key}-#{to.key}"
+    rgb = Raphael.getRGB(World.rtInitialStroke)
+    @_roundtrips[ref] =
+      trips: 1
+      color: Raphael.rgb2hsl(rgb.r, rgb.g, rgb.b)
+      strokeWidth: World.rtInitialStrokeWidth
+      path: path
+    ref
+
+  repeatRoundTrip: (ref, callback) =>
+    callback ?= ->
+    rt = @_roundtrips[ref]
+    @intensifyRoundtrip(rt)
+    rt.path.animate { 'stroke-width': rt.strokeWidth
+                    , stroke: rt.color.toString()
+                    },
+                    500, 'linear', =>
+                      callback()
+
+  intensifyRoundtrip: (rt) ->
+    rt.strokeWidth += 1 if rt.trips < 10
+    rt.color.s *= 1.05
+    rt.color.s = 1 if rt.color.s > 1
+    rt.color.l *= 1.05
+    rt.color.l = 1 if rt.color.l > 1
+    rt.trips += 1
 
   drawTrip: (from, to, callback) =>
     callback ?= ->
