@@ -1,4 +1,6 @@
 class @World
+  @latlonrg = /(\d+(?:\.\d+)?)[\xb0\s]?\s*(?:(\d+(?:\.\d+)?)['\u2019\u2032\s])?\s*(?:(\d+(?:\.\d+)?)["\u201d\u2033\s])?\s*([SNEW])?/i
+
   constructor: (el, @width, @height) ->
     @canvas = Raphael el, @width, @height
 
@@ -32,17 +34,15 @@ class @World
     anim = new ViewBoxAnimation(@canvas, 1500, x: 0, y: 0, w: 1000, h: 400)
     setTimeout((=> anim.execute(callback)), 0)
 
-  drawTrip: (fromCoords, toCoords, callback) =>
+  drawTrip: (from, to, callback) =>
     callback ?= ->
-    fromLL = @parseLatLon(fromCoords)
-    toLL   = @parseLatLon(toCoords)
-    path = @canvas.path("M#{fromLL.cx},#{fromLL.cy}")
+    path = @canvas.path("M#{from.cx},#{from.cy}")
                   .attr
                     stroke: '#a90606'
                     'stroke-width': 6
                     'stroke-linecap': 'round'
                     # 'stroke-dasharray': '.'
-    path.animate {path: "M#{fromLL.cx},#{fromLL.cy}L#{toLL.cx},#{toLL.cy}"},
+    path.animate {path: "M#{from.cx},#{from.cy}L#{to.cx},#{to.cy}"},
                  500, 'linear', =>
                    path.attr 'arrow-end': 'diamond-narrow-short'
                    callback()
@@ -51,7 +51,11 @@ class @World
   setMarker: (humanCoords) ->
     attr = @parseLatLon(humanCoords)
     attr.r = 0
-    dot = @canvas.circle().attr(fill: "r#FE7727:50-#F57124:100", stroke: "#fff", "stroke-width": 2, r: 0)
+    dot = @canvas.circle().attr
+            fill: 'r#FE7727:50-#F57124:100'
+            stroke: '#fff'
+            'stroke-width': 2
+            r: 0
     dot.stop().attr(attr).animate({r:5}, 1000, 'elastic')
 
   getXY: (lat, lon) ->
@@ -62,10 +66,8 @@ class @World
     lat: (y - 227.066) / -2.6938,
     lon: (x - 465.4) / 2.6938
 
-  latlonrg: /(\d+(?:\.\d+)?)[\xb0\s]?\s*(?:(\d+(?:\.\d+)?)['\u2019\u2032\s])?\s*(?:(\d+(?:\.\d+)?)["\u201d\u2033\s])?\s*([SNEW])?/i
-
-  parseLatLon: (latlon) ->
-    m = String(latlon).split(@latlonrg)
+  parseLatLon: (latlon) =>
+    m = String(latlon).split(World.latlonrg)
     lat = m && +m[1] + (m[2] || 0) / 60 + (m[3] || 0) / 3600
     lat = -lat if m[4].toUpperCase() == "S"
     lon = m && +m[6] + (m[7] || 0) / 60 + (m[8] || 0) / 3600
