@@ -82,13 +82,17 @@ class @World
 
   drawTrip: (from, to, callback) =>
     callback ?= ->
+    p1 =
+      cx: from.cx + (to.cx - from.cx) / 2
+      cy: from.cy + (to.cy - from.cy) / 2 - Math.abs(to.cx - from.cx) * 0.1
     path = @canvas.path("M#{from.cx},#{from.cy}")
                   .attr
                     stroke: '#a90606'
                     'stroke-width': 6
                     'stroke-linecap': 'round'
                     # 'stroke-dasharray': '.'
-    path.animate {path: "M#{from.cx},#{from.cy}L#{to.cx},#{to.cy}"},
+    path.animate {path: "M#{from.cx},#{from.cy}
+                         Q#{p1.cx},#{p1.cy},#{to.cx},#{to.cy}"},
                  500, 'linear', =>
                    path.attr 'arrow-end': 'diamond-narrow-short'
                    callback()
