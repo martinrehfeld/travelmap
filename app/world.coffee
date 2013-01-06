@@ -9,24 +9,31 @@ class @World
   constructor: (el, @width, @height) ->
     @canvas = Raphael el, @width, @height
 
-  draw: ->
+  draw: (callback) ->
     r = @canvas
 
     # background
     r.rect(0, 0, @width, @height).attr
       stroke: 'none',
-      fill: '30-#f8d59b-#e8ad5d'
+      fill: 'url("/images/mapbackground.jpg")'
+      'fill-opacity': 0.75
 
     # country shapes
     r.setStart()
     for own countryCode, shape of worldmap.shapes
       do (shape) =>
-        path = r.path(shape).attr(stroke: '#a23105', fill: '#b35317', 'stroke-opacity': 0.5)
+        path = r.path(shape).attr
+                 stroke: '#a23105'
+                 fill: '#b35317'
+                 'fill-opacity': 0.75
+                 'stroke-opacity': 0.5
         @_countries[countryCode] = path
     world = r.setFinish()
 
     # initial viewport
     @focusEurope()
+
+    setTimeout(callback, 1000)
 
   focusEurope: =>
     aspectRatio = @width / @height
