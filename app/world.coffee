@@ -3,6 +3,9 @@ class @World
   @rtInitialStroke = '#a90606'
   @rtInitialStrokeWidth = 4
 
+  _roundtrips: {}
+  _countries: {}
+
   constructor: (el, @width, @height) ->
     @canvas = Raphael el, @width, @height
 
@@ -16,9 +19,10 @@ class @World
 
     # country shapes
     r.setStart()
-    for own _, shape of worldmap.shapes
-      do (shape) ->
-        r.path(shape).attr(stroke: '#a23105', fill: '#b35317', 'stroke-opacity': 0.5)
+    for own countryCode, shape of worldmap.shapes
+      do (shape) =>
+        path = r.path(shape).attr(stroke: '#a23105', fill: '#b35317', 'stroke-opacity': 0.5)
+        @_countries[countryCode] = path
     world = r.setFinish()
 
     # initial viewport
@@ -35,8 +39,6 @@ class @World
     anim = new ViewBoxAnimation(@canvas, 1500, x: 0, y: 0, w: 1000, h: 400)
     setTimeout((=> anim.execute(callback)), 0)
 
-  _roundtrips: {}
-
   drawRoundTrip: (from, to) ->
     p1 =
       cx: from.cx + (to.cx - from.cx) / 2
@@ -52,6 +54,7 @@ class @World
                   .attr
                     stroke: World.rtInitialStroke
                     'stroke-width': World.rtInitialStrokeWidth
+    image = @canvas.image('/images/roundtrip.png', p1.cx-3, p1.cy+1.7, 6, 6)
 
     ref = "#{from.key}-#{to.key}"
     rgb = Raphael.getRGB(World.rtInitialStroke)
@@ -60,12 +63,14 @@ class @World
       color: Raphael.rgb2hsl(rgb.r, rgb.g, rgb.b)
       strokeWidth: World.rtInitialStrokeWidth
       path: path
+      image: image
     ref
 
   repeatRoundTrip: (ref, callback) =>
     callback ?= ->
     rt = @_roundtrips[ref]
     @intensifyRoundtrip(rt)
+    rt.image.toFront()
     rt.path.animate { 'stroke-width': rt.strokeWidth
                     , stroke: rt.color.toString()
                     },
@@ -82,6 +87,10 @@ class @World
 
   drawTrip: (from, to, callback) =>
     callback ?= ->
+
+    # highlight destination country
+    setTimeout((=> @_countries[to.country].attr(fill: '#a23105', 'fill-opacity': 0.5)), 500)
+
     p1 =
       cx: from.cx + (to.cx - from.cx) / 2
       cy: from.cy + (to.cy - from.cy) / 2 - Math.abs(to.cx - from.cx) * 0.1
@@ -96,17 +105,6 @@ class @World
                  500, 'linear', =>
                    path.attr 'arrow-end': 'diamond-narrow-short'
                    callback()
-
-
-  setMarker: (humanCoords) ->
-    attr = @parseLatLon(humanCoords)
-    attr.r = 0
-    dot = @canvas.circle().attr
-            fill: 'r#FE7727:50-#F57124:100'
-            stroke: '#fff'
-            'stroke-width': 2
-            r: 0
-    dot.stop().attr(attr).animate({r:5}, 1000, 'elastic')
 
   getXY: (lat, lon) ->
     cx: lon * 2.6938 + 465.4,
