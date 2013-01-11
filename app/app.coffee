@@ -19,8 +19,8 @@ class @App
                   world.drawTrip Cities.BER, Cities['Moskau'], ->
                     world.repeatRoundTrip rtThfFmo, ->
                       fn = ->
-                          world.focusWorld ->
-                            world.drawTrip Cities.BER, Cities['New York'], ->
-                              world.drawTrip Cities.BER, Cities['Rio de Janeiro'], ->
-                                world.drawTrip Cities.BER, Cities['Sydney']
+                        world.focusWorld ->
+                          world.drawTrip Cities.BER, Cities['New York'], ->
+                            world.drawTrip Cities.BER, Cities['Rio de Janeiro'], ->
+                              world.drawTrip Cities.BER, Cities['Sydney']
                       setTimeout(fn, 5000)
