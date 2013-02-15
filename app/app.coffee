@@ -10,17 +10,18 @@ class @App
 
     world.draw ->
       rtThfFmo = world.drawRoundTrip Cities.THF, Cities.FMO
-      world.drawTrip Cities.BER, Cities['Paris'], ->
-        world.repeatRoundTrip rtThfFmo, ->
-          world.repeatRoundTrip rtThfFmo, ->
-            world.drawTrip Cities.BER, Cities['Rom'], ->
-              world.repeatRoundTrip rtThfFmo, ->
-                world.repeatRoundTrip rtThfFmo, ->
-                  world.drawTrip Cities.BER, Cities['Moskau'], ->
-                    world.repeatRoundTrip rtThfFmo, ->
-                      fn = ->
-                        world.focusWorld ->
-                          world.drawTrip Cities.BER, Cities['New York'], ->
-                            world.drawTrip Cities.BER, Cities['Rio de Janeiro'], ->
-                              world.drawTrip Cities.BER, Cities['Sydney']
-                      setTimeout(fn, 5000)
+      async.series([
+        (cb) -> world.drawTrip Cities.BER, Cities['Paris'], -> cb(null),
+        (cb) -> world.repeatRoundTrip rtThfFmo, -> cb(null),
+        (cb) -> world.repeatRoundTrip rtThfFmo, -> cb(null),
+        (cb) -> world.drawTrip Cities.BER, Cities['Rom'], -> cb(null),
+        (cb) -> world.repeatRoundTrip rtThfFmo, -> cb(null),
+        (cb) -> world.repeatRoundTrip rtThfFmo, -> cb(null),
+        (cb) -> world.drawTrip Cities.BER, Cities['Moskau'], -> cb(null),
+        (cb) -> world.repeatRoundTrip rtThfFmo, -> cb(null),
+        (cb) -> setTimeout((-> cb(null)), 5000),
+        (cb) -> world.focusWorld -> cb(null),
+        (cb) -> world.drawTrip Cities.BER, Cities['New York'], -> cb(null),
+        (cb) -> world.drawTrip Cities.BER, Cities['Rio de Janeiro'], -> cb(null),
+        (cb) -> world.drawTrip Cities.BER, Cities['Sydney'], -> cb(null)
+      ])
