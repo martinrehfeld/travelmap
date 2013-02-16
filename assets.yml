@@ -1,13 +1,13 @@
 package_path: javascripts
-package_assets: <%= ENV['MM_ENV'] == 'build' ? 'always' : 'off' %>
+package_assets: <%= ENV['MM_ENV'] == '!build' ? 'always' : 'off' %>
 javascript_compressor: yui
 template_function: _.template
 javascripts:
   site:
-    - public/javascripts/raphael-min.js
-    - public/javascripts/underscore.js
     - public/javascripts/async.js
+    - public/javascripts/raphael-min.js
     - public/javascripts/worldmap.js
+    - public/javascripts/underscore.js
     - app/templates/*.jst
     - public/javascripts/app/*.js
     - public/javascripts/init.js
