@@ -2,7 +2,9 @@ class @World
   @latlonrg = /(\d+(?:\.\d+)?)[\xb0\s]?\s*(?:(\d+(?:\.\d+)?)['\u2019\u2032\s])?\s*(?:(\d+(?:\.\d+)?)["\u201d\u2033\s])?\s*([SNEW])?/i
   @rtInitialStroke = '#a90606'
   @rtInitialStrokeWidth = 4
+  @animSpeed = 100
 
+  __roundtrips: {}
   _roundtrips: {}
   _countries: {}
 
@@ -37,16 +39,20 @@ class @World
 
   focusEurope: =>
     aspectRatio = @width / @height
-    newHeight = 85
+    newHeight = 84
     newWidth = newHeight * aspectRatio
-    @canvas.setViewBox(400, 50, newWidth, newHeight, false)
+    @canvas.setViewBox(438, 53, newWidth, newHeight, false)
 
   focusWorld: (callback) =>
     callback ?= ->
-    anim = new ViewBoxAnimation(@canvas, 1500, x: 0, y: 0, w: 1000, h: 400)
+    anim = new ViewBoxAnimation(@canvas, 1500, x: 128, y: 0, w: 722, h: 400)
     setTimeout((=> anim.execute(callback)), 0)
 
-  drawRoundTrip: (from, to) ->
+  updateTime: (year, cw, callback) ->
+    $('#time').html JST.time(year: year, cw: cw)
+    callback?()
+
+  drawRoundTrip: (from, to, callback) ->
     p1 =
       cx: from.cx + (to.cx - from.cx) / 2
       cy: from.cy + (to.cy - from.cy) / 2 + (to.cx - from.cx) * 0.3
@@ -71,24 +77,27 @@ class @World
       strokeWidth: World.rtInitialStrokeWidth
       path: path
       image: image
-    ref
+    @__roundtrips[from] ?= {}
+    @__roundtrips[from][to] = ref
+    callback?()
 
-  repeatRoundTrip: (ref, callback) =>
-    callback ?= ->
+  repeatRoundTrip: (from, to, callback) =>
+    ref = @__roundtrips[from][to]
     rt = @_roundtrips[ref]
     @intensifyRoundtrip(rt)
+    rt.path.toFront()
     rt.image.toFront()
     rt.path.animate { 'stroke-width': rt.strokeWidth
                     , stroke: rt.color.toString()
                     },
-                    500, 'linear', =>
-                      callback()
+                    World.animSpeed, 'linear', =>
+                      callback?()
 
   intensifyRoundtrip: (rt) ->
     rt.strokeWidth += 1 if rt.trips < 10
-    rt.color.s *= 1.05
+    rt.color.s *= 1.005
     rt.color.s = 1 if rt.color.s > 1
-    rt.color.l *= 1.05
+    rt.color.l *= 1.005
     rt.color.l = 1 if rt.color.l > 1
     rt.trips += 1
 
@@ -109,7 +118,7 @@ class @World
                     # 'stroke-dasharray': '.'
     path.animate {path: "M#{from.cx},#{from.cy}
                          Q#{p1.cx},#{p1.cy},#{to.cx},#{to.cy}"},
-                 500, 'linear', =>
+                 World.animSpeed, 'linear', =>
                    path.attr 'arrow-end': 'diamond-narrow-short'
                    callback()
 
