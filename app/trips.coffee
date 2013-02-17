@@ -23,16 +23,17 @@
           worldZoom = true
         actions.push [world.updateTime, [year, cw]]
 
+        airport = @airport(year)
         cities = rawCities.split(/,\s*/)
         if cities[0]
-          actions.push [world.drawTrip, [@city('BER'), @city(cities[0])]]
+          actions.push [world.drawTrip, [airport, @city(cities[0])]]
         if cities.length > 1
           for city, i in cities
             do (city, i) =>
               if cities[i + 1]
                 actions.push [world.drawTrip, [@city(cities[i]), @city(cities[i+1])]]
               else
-                actions.push [world.drawTrip, [@city(cities[i]), @city('BER')]]
+                actions.push [world.drawTrip, [@city(cities[i]), airport]]
 
         ###
         if roundtrip && roundtrip != './.'
@@ -48,6 +49,15 @@
   city: (name) ->
     obj = Cities[name]
     if obj? then obj else throw("Undefined city '#{name}'")
+
+  airport: (year) ->
+    year = parseInt(year, 10)
+    if year < 2000
+      @city('BER')
+    else if year < 2004
+      @city('FMO')
+    else
+      @city('CGN')
 
   roundtripToArgs: (roundtrip) ->
     [from, to, _] = roundtrip.split(/\s*-\s*/)

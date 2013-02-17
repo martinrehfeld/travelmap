@@ -105,7 +105,7 @@ class @World
     callback ?= ->
 
     # highlight destination country
-    setTimeout((=> @_countries[to.country].attr(fill: '#a23105', 'fill-opacity': 0.4)), 500)
+    setTimeout((=> @_countries[to.country].attr(fill: '#a23105', 'fill-opacity': 0.4)), World.animSpeed+1)
 
     p1 =
       cx: from.cx + (to.cx - from.cx) / 2
