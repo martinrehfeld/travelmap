@@ -1,5 +1,5 @@
 package_path: javascripts
-package_assets: <%= ENV['MM_ENV'] == '!build' ? 'always' : 'off' %>
+package_assets: <%= ENV['MM_ENV'] == 'build' ? 'always' : 'off' %>
 javascript_compressor: yui
 template_function: _.template
 javascripts:

@@ -34,12 +34,14 @@
               else
                 actions.push [world.drawTrip, [@city(cities[i]), @city('BER')]]
 
+        ###
         if roundtrip && roundtrip != './.'
           if seenRoundtrips[roundtrip]
             actions.push [world.repeatRoundTrip, @roundtripToArgs(roundtrip)]
           else
             actions.push [world.drawRoundTrip, @roundtripToArgs(roundtrip)]
             seenRoundtrips[roundtrip] = true
+        ###
 
     actions
 
