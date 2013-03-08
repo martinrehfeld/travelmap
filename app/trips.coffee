@@ -26,14 +26,14 @@
         airport = @airport(year)
         cities = rawCities.split(/,\s*/)
         if cities[0]
-          actions.push [world.drawTrip, [airport, @city(cities[0])]]
+          actions.push [world.drawTrip, [airport, @city(cities[0]), false]]
         if cities.length > 1
           for city, i in cities
             do (city, i) =>
               if cities[i + 1]
-                actions.push [world.drawTrip, [@city(cities[i]), @city(cities[i+1])]]
+                actions.push [world.drawTrip, [@city(cities[i]), @city(cities[i+1]), true]]
               else
-                actions.push [world.drawTrip, [@city(cities[i]), airport]]
+                actions.push [world.drawTrip, [@city(cities[i]), airport, true]]
 
         ###
         if roundtrip && roundtrip != './.'

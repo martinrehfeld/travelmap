@@ -101,7 +101,7 @@ class @World
     rt.color.l = 1 if rt.color.l > 1
     rt.trips += 1
 
-  drawTrip: (from, to, callback) =>
+  drawTrip: (from, to, exact, callback) =>
     callback ?= ->
 
     # highlight destination country
@@ -110,6 +110,15 @@ class @World
     p1 =
       cx: from.cx + (to.cx - from.cx) / 2
       cy: from.cy + (to.cy - from.cy) / 2 - Math.abs(to.cx - from.cx) * 0.1
+
+    if exact
+      toX = to.cx
+      toY = to.cy
+    else
+      # introduce a slight variation in the 'to' coordinates
+      toX = to.cx + (Math.random() * 1.5 - 0.5)
+      toY = to.cy + (Math.random() * 1.5 - 0.5)
+
     path = @canvas.path("M#{from.cx},#{from.cy}")
                   .attr
                     stroke: '#a90606'
@@ -117,7 +126,7 @@ class @World
                     'stroke-linecap': 'round'
                     # 'stroke-dasharray': '.'
     path.animate {path: "M#{from.cx},#{from.cy}
-                         Q#{p1.cx},#{p1.cy},#{to.cx},#{to.cy}"},
+                         Q#{p1.cx},#{p1.cy},#{toX},#{toY}"},
                  World.animSpeed, 'linear', =>
                    path.attr 'arrow-end': 'diamond-narrow-short'
                    callback()
