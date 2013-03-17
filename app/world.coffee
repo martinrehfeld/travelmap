@@ -116,8 +116,8 @@ class @World
       toY = to.cy
     else
       # introduce a slight variation in the 'to' coordinates
-      toX = to.cx + (Math.random() * 1.5 - 0.5)
-      toY = to.cy + (Math.random() * 1.5 - 0.5)
+      toX = to.cx + (Math.random() * 1.5 - 0.75)
+      toY = to.cy + (Math.random() * 1.5 - 0.75)
 
     path = @canvas.path("M#{from.cx},#{from.cy}")
                   .attr
