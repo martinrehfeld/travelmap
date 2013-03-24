@@ -1,4 +1,8 @@
-# ARe Travel Map
+# Travel Map Visualisation
+
+A little travelmap visualisation built with Raphaël, Async.js and CoffeeScript.
+It was used in the context of a larger presentation and I thought it might be
+share-worthy. Have fun.
 
 ## Setup / Development
 
