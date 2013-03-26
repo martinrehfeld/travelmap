@@ -2,7 +2,7 @@
 
 A little travelmap visualisation built with Raphaël, Async.js and CoffeeScript.
 It was used in the context of a larger presentation and I thought it might be
-share-worthy. Have fun.
+share-worthy. [Have fun with the demo](http://2013-03-23.s3-website-eu-west-1.amazonaws.com/).
 
 ## Setup / Development
 
